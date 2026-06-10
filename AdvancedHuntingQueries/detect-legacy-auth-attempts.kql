@@ -1,0 +1,6 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(24h)
+| where Application in ("Exchange ActiveSync", "IMAP4", "MAPI Over HTTP", "Other clients", "POP3", "SMTP", "Authenticated SMTP")
+| summarize Attempts = count(), Users = make_set(AccountUpn), UniqueUsers = dcount(AccountUpn) by Application, IPAddress, bin(Timestamp, 1h)
+| extend ThreatType = "Legacy Auth Attempt Post-Migration"
+| project Timestamp = bin(Timestamp, 1h), Application, IPAddress, Attempts, UniqueUsers, Users, ThreatType

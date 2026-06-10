@@ -1,0 +1,25 @@
+// Rule: Legacy Authentication Attempts
+// Severity: Medium | Tactic: Defense Evasion
+// CA002 blocks legacy auth — this detects
+// attempts that hit the block
+// Confirms legacy clients still in use
+// post-migration
+
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ClientAppUsed in (
+    "Exchange ActiveSync",
+    "IMAP4",
+    "MAPI Over HTTP",
+    "Other clients",
+    "POP3",
+    "SMTP",
+    "Authenticated SMTP"
+  )
+| summarize
+    Attempts = count(),
+    Users = make_set(UserPrincipalName),
+    UniqueUsers = dcount(UserPrincipalName)
+  by ClientAppUsed, IPAddress, bin(TimeGenerated, 1h)
+| extend ThreatType = "Legacy Auth Attempt Post-Migration"
+| project TimeGenerated = bin(TimeGenerated, 1h), ClientAppUsed, IPAddress, Attempts, UniqueUsers, Users, ThreatType

@@ -1,0 +1,17 @@
+// Rule: After-Hours NOC Engineer Access
+// Severity: Medium | Tactic: Initial Access
+// NOC staff sign-in outside shift hours
+// Helix NOC operates 06:00-22:00 UTC
+
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| extend HourUTC = datetime_part("hour", TimeGenerated)
+| where HourUTC < 6 or HourUTC > 22
+| where UserPrincipalName in (
+    "bukayo.saka@bbgseclab.onmicrosoft.com",
+    "gabriel.magalhaes@bbgseclab.onmicrosoft.com",
+    "david.raya@bbgseclab.onmicrosoft.com"
+  )
+| project TimeGenerated, UserPrincipalName, IPAddress, Location, HourUTC
+| extend ThreatType = "After-Hours NOC Access"

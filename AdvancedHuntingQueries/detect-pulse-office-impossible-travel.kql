@@ -1,0 +1,10 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(2h)
+| where ErrorCode == 0
+| where AccountUpn startswith "pls-"
+| summarize Locations = make_set(Country), IPs = make_set(IPAddress), FirstSeen = min(Timestamp), LastSeen = max(Timestamp) by AccountUpn
+| where array_length(Locations) > 1
+| extend TimeDiff = datetime_diff('minute', LastSeen, FirstSeen)
+| where TimeDiff < 120
+| extend ThreatType = "Pulse Account Impossible Travel"
+| project AccountUpn, Locations, IPs, TimeDiff, ThreatType, FirstSeen, LastSeen

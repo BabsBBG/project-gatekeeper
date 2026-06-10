@@ -1,0 +1,7 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(30m)
+| where ErrorCode in (50074, 50076, 50079, 500121)
+| summarize MFAAttempts = count(), IPs = make_set(IPAddress) by AccountUpn, bin(Timestamp, 15m)
+| where MFAAttempts >= 5
+| extend ThreatType = "MFA Fatigue Attack"
+| project Timestamp = bin(Timestamp, 15m), AccountUpn, MFAAttempts, IPs, ThreatType

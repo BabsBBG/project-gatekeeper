@@ -1,0 +1,22 @@
+// Rule: Pulse Office + Impossible Travel
+// Severity: High | Tactic: Initial Access
+// Sign-in from multiple countries within 2hrs
+// for accounts associated with Pulse migration
+// Note: IP-based Pulse office check requires
+// production environment
+
+SigninLogs
+| where TimeGenerated > ago(2h)
+| where ResultType == 0
+| where UserPrincipalName startswith "pls-"
+| summarize
+    Locations = make_set(Location),
+    IPs = make_set(IPAddress),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated)
+  by UserPrincipalName
+| where array_length(Locations) > 1
+| extend TimeDiff = datetime_diff('minute', LastSeen, FirstSeen)
+| where TimeDiff < 120
+| extend ThreatType = "Pulse Account Impossible Travel"
+| project UserPrincipalName, Locations, IPs, TimeDiff, ThreatType, FirstSeen, LastSeen

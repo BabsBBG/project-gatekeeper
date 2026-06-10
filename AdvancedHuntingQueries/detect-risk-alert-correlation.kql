@@ -1,0 +1,16 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(1h)
+| where RiskState in ("atRisk", "confirmedCompromised")
+| project AccountUpn, SigninTime = Timestamp, RiskState, IPAddress, Country
+| join kind=inner (
+    AlertInfo
+    | where Timestamp > ago(1h)
+    | where ServiceSource in ("Microsoft Defender for Identity", "Microsoft Defender for Cloud Apps")
+    | extend AlertUser = tostring(Entities[0].AccountUpn)
+    | where isnotempty(AlertUser)
+    | project AlertUser, AlertTime = Timestamp, Title, Severity
+) on $left.AccountUpn == $right.AlertUser
+| extend TimeDiff = abs(datetime_diff('minute', AlertTime, SigninTime))
+| where TimeDiff < 60
+| extend ThreatType = "Risk-Alert Correlation"
+| project AccountUpn, RiskState, Title, Severity, TimeDiff, IPAddress, Country, ThreatType

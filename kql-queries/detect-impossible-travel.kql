@@ -1,0 +1,21 @@
+// Rule: Impossible Travel Detection
+// Severity: High | Tactic: Initial Access
+// Detects sign-ins from different countries
+// within 60 minutes for the same account
+
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 0
+| project UserPrincipalName, IPAddress, Location, TimeGenerated
+| summarize
+    Locations = make_set(Location),
+    IPs = make_set(IPAddress),
+    FirstSeen = min(TimeGenerated),
+    LastSeen = max(TimeGenerated),
+    SigninCount = count()
+  by UserPrincipalName
+| where array_length(Locations) > 1
+| extend TimeDiffMinutes = datetime_diff('minute', LastSeen, FirstSeen)
+| where TimeDiffMinutes < 60
+| extend ThreatType = "Impossible Travel"
+| project UserPrincipalName, Locations, IPs, TimeDiffMinutes, ThreatType, FirstSeen, LastSeen

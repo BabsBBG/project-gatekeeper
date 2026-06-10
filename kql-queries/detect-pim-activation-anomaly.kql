@@ -1,0 +1,19 @@
+// Rule: PIM Activation Outside Approved Window
+// Severity: High | Tactic: Privilege Escalation
+// PIM activations outside 06:00-20:00 UTC
+// Data source: AuditLogs (directory events)
+// Note: Not available in Advanced Hunting —
+// use Entra Audit Logs or Sentinel AuditLogs table
+
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where Category == "RoleManagement"
+| where OperationName has "Activate"
+| where Result == "success"
+| extend HourUTC = datetime_part("hour", TimeGenerated)
+| extend IsOutsideWindow = iff(HourUTC < 6 or HourUTC > 20, true, false)
+| extend ActivatedBy = tostring(InitiatedBy.user.userPrincipalName)
+| extend TargetRole = tostring(TargetResources[0].displayName)
+| where IsOutsideWindow == true
+| project TimeGenerated, ActivatedBy, TargetRole, HourUTC, IsOutsideWindow, OperationName
+| extend ThreatType = "PIM Activation Outside Window"

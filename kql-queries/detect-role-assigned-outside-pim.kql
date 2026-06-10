@@ -1,0 +1,30 @@
+// Rule: Role Assigned Outside PIM
+// Severity: High | Tactic: Privilege Escalation
+// Direct role assignment bypassing PIM workflow
+// Data source: AuditLogs (directory events)
+// Note: Not available in Advanced Hunting —
+// use Entra Audit Logs or Sentinel AuditLogs table
+
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where Category == "RoleManagement"
+| where OperationName == "Add member to role"
+| where Result == "success"
+// Exclude system-initiated or Microsoft service actions
+| where not(InitiatedBy has "Microsoft" or InitiatedBy has "Azure AD PIM")
+// Parse the target role name and assigned user
+| extend RoleName = tostring(TargetResources[0].displayName)
+| extend AssignedUser = tostring(TargetResources[0].userPrincipalName)
+// Parse who did the assignment (handle different structures)
+| extend AssignedBy = case(
+    isnotempty(InitiatedBy.user.userPrincipalName), tostring(InitiatedBy.user.userPrincipalName),
+    isnotempty(InitiatedBy.app.displayName), tostring(InitiatedBy.app.displayName),
+    "Unknown"
+)
+// Exclude your own admin account (or specific approved break-glass)
+| where AssignedBy != "admin@bbgseclab.onmicrosoft.com"
+// Focus on high‑privilege roles (optional but recommended)
+| where RoleName in ("Global Administrator", "Privileged Role Administrator", "Exchange Administrator", "SharePoint Administrator")
+| project TimeGenerated, AssignedBy, AssignedUser, RoleName, OperationName
+| extend ThreatType = "Role Assigned Outside PIM"
+| extend ResponseAction = "Investigate immediately. Role should be eligible via PIM, not permanent."

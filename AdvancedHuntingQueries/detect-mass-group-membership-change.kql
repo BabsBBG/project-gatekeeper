@@ -1,0 +1,6 @@
+﻿// Note: Advanced Hunting does not have a direct AuditLogs equivalent.
+// Use Sentinel for this detection.
+AuditLogs
+| where TimeGenerated > ago(1h)
+| where OperationName has "Add member to group"
+| take 10

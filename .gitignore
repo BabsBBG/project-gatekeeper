@@ -1,0 +1,19 @@
+# Terraform secrets
+terraform/terraform.tfvars
+*.tfvars
+*.tfvars.json
+
+# Local IDE / OS junk
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# PowerShell history / temp
+*.ps1~
+*.ps1.bak
+
+# Any local test files
+test/
+temp/

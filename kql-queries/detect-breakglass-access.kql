@@ -1,0 +1,15 @@
+// Rule: Break-Glass Account Access
+// Severity: CRITICAL | Tactic: Any
+// Break-glass accounts should NEVER sign in
+// during normal operations
+// Any access = immediate P1 incident
+
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where UserPrincipalName in (
+    "bg-01@bbgseclab.onmicrosoft.com",
+    "bg-02@bbgseclab.onmicrosoft.com"
+  )
+| project TimeGenerated, UserPrincipalName, IPAddress, Location, ResultType, ConditionalAccessStatus
+| extend ThreatType = "CRITICAL: Break-Glass Account Access"
+| extend ResponseAction = "Initiate P1 incident immediately. Verify with security team. Do NOT auto-block — may be legitimate emergency access."

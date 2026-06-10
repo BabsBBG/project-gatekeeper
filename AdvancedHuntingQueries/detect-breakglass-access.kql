@@ -1,0 +1,5 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(24h)
+| where AccountUpn in ("bg-01@bbgseclab.onmicrosoft.com", "bg-02@bbgseclab.onmicrosoft.com")
+| project Timestamp, AccountUpn, IPAddress, ErrorCode, LogonType, Application
+| extend ThreatType = "CRITICAL: Break-Glass Account Access"

@@ -1,0 +1,8 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(24h)
+| where ErrorCode == 0
+| extend HourUTC = datetime_part("hour", Timestamp)
+| where HourUTC < 6 or HourUTC > 22
+| where AccountUpn in ("bukayo.saka@bbgseclab.onmicrosoft.com", "gabriel.magalhaes@bbgseclab.onmicrosoft.com", "david.raya@bbgseclab.onmicrosoft.com")
+| project Timestamp, AccountUpn, IPAddress, Country, HourUTC
+| extend ThreatType = "After-Hours NOC Access"

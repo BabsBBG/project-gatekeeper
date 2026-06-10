@@ -1,0 +1,189 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "workflows_HLX_HTTP_001_HighRiskResponse_name": {
+            "defaultValue": "HLX-HTTP-001-HighRiskResponse",
+            "type": "String"
+        }
+    },
+    "variables": {},
+    "resources": [
+        {
+            "type": "Microsoft.Logic/workflows",
+            "apiVersion": "2017-07-01",
+            "name": "[parameters('workflows_HLX_HTTP_001_HighRiskResponse_name')]",
+            "location": "uksouth",
+            "identity": {
+                "type": "SystemAssigned"
+            },
+            "properties": {
+                "state": "Enabled",
+                "definition": {
+                    "metadata": {
+                        "notes": {}
+                    },
+                    "$schema": "https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#",
+                    "contentVersion": "1.0.0.0",
+                    "parameters": {
+                        "$connections": {
+                            "defaultValue": {},
+                            "type": "Object"
+                        }
+                    },
+                    "triggers": {
+                        "When_an_HTTP_request_is_received": {
+                            "type": "Request",
+                            "kind": "Http",
+                            "inputs": {
+                                "method": "POST",
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "upn": {
+                                            "type": "string"
+                                        },
+                                        "incidentId": {
+                                            "type": "string"
+                                        },
+                                        "severity": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "actions": {
+                        "Condition": {
+                            "actions": {
+                                "HTTP_(Revoke_Sessions)": {
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "https://graph.microsoft.com/v1.0/users/@{triggerBody()?['upn']}/revokeSignInSessions",
+                                        "method": "POST",
+                                        "authentication": {
+                                            "type": "ActiveDirectoryOAuth",
+                                            "tenant": "bbgseclab.onmicrosoft.com",
+                                            "audience": "https://graph.microsoft.com",
+                                            "clientId": "3f812b28-9567-40bb-8db0-f98f126ec670",
+                                            "secret": "0rp8Q~WbQGNKK~r1s89kmefNXLsmAcSRq2DoTb6I"
+                                        }
+                                    }
+                                },
+                                "Update_user": {
+                                    "runAfter": {
+                                        "HTTP_(Revoke_Sessions)": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['azuread']['connectionId']"
+                                            }
+                                        },
+                                        "method": "patch",
+                                        "body": {
+                                            "accountEnabled": false
+                                        },
+                                        "path": "/v1.0/users/@{encodeURIComponent(triggerBody()?['upn'])}"
+                                    }
+                                },
+                                "HTTP_(Add_to_group)": {
+                                    "runAfter": {
+                                        "Update_user": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "Http",
+                                    "inputs": {
+                                        "uri": "https://graph.microsoft.com/v1.0/groups/8f104bec-f8da-4d6d-8844-831f40d71298/members/$ref",
+                                        "method": "POST",
+                                        "headers": {
+                                            "Content-Type": "application/json"
+                                        },
+                                        "body": "@concat('{\"@odata.id\":\"https://graph.microsoft.com/v1.0/users/',triggerBody()?['upn'],'\"}')",
+                                        "authentication": {
+                                            "type": "ActiveDirectoryOAuth",
+                                            "tenant": "bbgseclab.onmicrosoft.com",
+                                            "audience": "https://graph.microsoft.com",
+                                            "clientId": "3f812b28-9567-40bb-8db0-f98f126ec670",
+                                            "secret": "0rp8Q~WbQGNKK~r1s89kmefNXLsmAcSRq2DoTb6I"
+                                        }
+                                    }
+                                },
+                                "Send_an_email_(V2)": {
+                                    "runAfter": {
+                                        "HTTP_(Add_to_group)": [
+                                            "Succeeded"
+                                        ]
+                                    },
+                                    "type": "ApiConnection",
+                                    "inputs": {
+                                        "host": {
+                                            "connection": {
+                                                "name": "@parameters('$connections')['office365']['connectionId']"
+                                            }
+                                        },
+                                        "method": "post",
+                                        "body": {
+                                            "To": "admin@bbgseclab.onmicrosoft.com",
+                                            "Subject": "SECURITY ALERT: Account Auto-Contained",
+                                            "Body": "<p class=\"editor-paragraph\">AUTOMATED SECURITY RESPONSE — PROJECT GATEKEEPER<br><br>Account contained: @{triggerBody()?['upn']}<br>Incident ID: @{triggerBody()?['incidentId']}<br>Severity: @{triggerBody()?['severity']}<br><br>Actions taken automatically:<br>✓ All sessions revoked<br>✓ Account disabled<br>✓ Added to HLX-Offboarding group<br>✓ Leaver workflow triggered<br><br>Time to containment: under 60 seconds.<br>Investigate the incident and confirm actions.</p>",
+                                            "Importance": "Normal"
+                                        },
+                                        "path": "/v2/Mail"
+                                    }
+                                }
+                            },
+                            "runAfter": {},
+                            "else": {
+                                "actions": {
+                                    "Send_an_email_(V2)_1": {
+                                        "type": "ApiConnection",
+                                        "inputs": {
+                                            "host": {
+                                                "connection": {
+                                                    "name": "@parameters('$connections')['office365']['connectionId']"
+                                                }
+                                            },
+                                            "method": "post",
+                                            "body": {
+                                                "To": "admin@bbgseclab.onmicrosoft.com",
+                                                "Subject": "CRITICAL: Break-Glass Account Accessed — NO AUTO-BLOCK",
+                                                "Body": "<p class=\"editor-paragraph\">BREAK-GLASS ACCOUNT ACCESS DETECTED<br><br>Account: @{triggerBody()?['upn']}<br>Incident: @{triggerBody()?['incidentId']}<br><br>THIS ACCOUNT HAS NOT BEEN AUTOMATICALLY BLOCKED.<br><br>Break-glass accounts are excluded from automated<br>containment to preserve emergency access capability.<br><br>Initiate P1 incident response immediately.<br>Verify with the security team before taking any action.</p>",
+                                                "Importance": "Normal"
+                                            },
+                                            "path": "/v2/Mail"
+                                        }
+                                    }
+                                }
+                            },
+                            "expression": {
+                                "and": [
+                                    {
+                                        "not": {
+                                            "contains": [
+                                                "@triggerBody()?['upn']",
+                                                "bg-0"
+                                            ]
+                                        }
+                                    }
+                                ]
+                            },
+                            "type": "If"
+                        }
+                    },
+                    "outputs": {}
+                },
+                "parameters": {
+                    "$connections": {
+                        "value": {}
+                    }
+                }
+            }
+        }
+    ]
+}

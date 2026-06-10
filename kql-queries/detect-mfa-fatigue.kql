@@ -1,0 +1,15 @@
+// Rule: MFA Fatigue / Push Bombing
+// Severity: Medium | Tactic: Defense Evasion
+// Repeated MFA push denials on same account
+// in short window
+
+SigninLogs
+| where TimeGenerated > ago(30m)
+| where ResultType in (50074, 50076, 50079, 500121)
+| summarize
+    MFAAttempts = count(),
+    IPs = make_set(IPAddress)
+  by UserPrincipalName, bin(TimeGenerated, 15m)
+| where MFAAttempts >= 5
+| extend ThreatType = "MFA Fatigue Attack"
+| project TimeGenerated = bin(TimeGenerated, 15m), UserPrincipalName, MFAAttempts, IPs, ThreatType

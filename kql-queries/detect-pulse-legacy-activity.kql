@@ -1,0 +1,13 @@
+// Rule: Pulse Legacy Account Activity
+// Severity: Medium | Tactic: Initial Access
+// Successful sign-in from pls- prefix account
+// All Pulse legacy accounts under controlled
+// migration — unexpected activity = investigate
+
+SigninLogs
+| where TimeGenerated > ago(24h)
+| where ResultType == 0
+| where UserPrincipalName startswith "pls-"
+| project TimeGenerated, UserPrincipalName, IPAddress, Location, AuthenticationRequirement, RiskState
+| extend ThreatType = "Pulse Legacy Account Activity"
+| extend RiskNote = "Verify activity is authorised migration task"

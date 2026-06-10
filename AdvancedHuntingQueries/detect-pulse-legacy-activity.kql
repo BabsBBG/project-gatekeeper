@@ -1,0 +1,6 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(24h)
+| where ErrorCode == 0
+| where AccountUpn startswith "pls-"
+| project Timestamp, AccountUpn, IPAddress, Country, AuthenticationRequirement, RiskState
+| extend ThreatType = "Pulse Legacy Account Activity"

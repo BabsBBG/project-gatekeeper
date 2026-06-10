@@ -1,0 +1,19 @@
+// Rule: Pulse Partner Network Volume Anomaly
+// Severity: Medium | Tactic: Initial Access
+// Unusual sign-in volume from Pulse partner
+// network segment 10.20.1.0/24
+// Note: Requires production environment with
+// physical Pulse partner network infrastructure
+
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where ResultType == 0
+| where IPAddress startswith "10.20.1."
+| summarize
+    SigninCount = count(),
+    UniqueUsers = dcount(UserPrincipalName),
+    UserList = make_set(UserPrincipalName)
+  by bin(TimeGenerated, 15m)
+| where SigninCount > 10 or UniqueUsers > 3
+| extend ThreatType = "Pulse Partner Network Anomaly"
+| project TimeGenerated = bin(TimeGenerated, 15m), SigninCount, UniqueUsers, UserList, ThreatType

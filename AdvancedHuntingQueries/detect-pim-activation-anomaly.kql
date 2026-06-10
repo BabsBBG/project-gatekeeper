@@ -1,0 +1,7 @@
+﻿// Note: Advanced Hunting does not have a direct AuditLogs equivalent.
+// Use Sentinel for this detection.
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where Category == "RoleManagement"
+| where OperationName has "Activate"
+| take 10

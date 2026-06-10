@@ -1,0 +1,26 @@
+// Rule: Risk + Alert Correlation
+// Severity: High | Tactic: Initial Access
+// Correlates risky sign-ins with security alerts
+// on the same user within 60 minutes
+// SENTINEL ONLY — requires SecurityAlert table
+// Not executable in Advanced Hunting
+
+SigninLogs
+| where TimeGenerated > ago(1h)
+| where RiskState in ("atRisk", "confirmedCompromised")
+| project UserPrincipalName,
+    SigninTime = TimeGenerated,
+    RiskState, IPAddress, Location
+| join kind=inner (
+    SecurityAlert
+    | where TimeGenerated > ago(1h)
+    | extend AlertUser = extract(@'"UserPrincipalName":"(.*?)"', 1, tostring(Entities))
+    | where isnotempty(AlertUser)
+    | project AlertUser,
+        AlertTime = TimeGenerated,
+        AlertName, AlertSeverity
+  ) on $left.UserPrincipalName == $right.AlertUser
+| extend TimeDiff = abs(datetime_diff('minute', AlertTime, SigninTime))
+| where TimeDiff < 60
+| extend ThreatType = "Risk-Alert Correlation"
+| project UserPrincipalName, RiskState, AlertName, AlertSeverity, TimeDiff, IPAddress, Location, ThreatType

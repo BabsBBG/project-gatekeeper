@@ -1,0 +1,29 @@
+// Rule: Offboarding Workflow Bypass
+// Severity: Medium | Tactic: Defense Evasion
+// Account disabled without HLX-Offboarding
+// group trigger — bypasses leaver workflow
+// Data source: AuditLogs (directory events)
+// Note: Not available in Advanced Hunting
+
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where OperationName == "Update user"
+| where Result == "success"
+| extend ModifiedUser = tostring(TargetResources[0].userPrincipalName)
+| extend ModifiedBy = tostring(InitiatedBy.user.userPrincipalName)
+| extend ModifiedProps = TargetResources[0].modifiedProperties
+| where ModifiedProps has "AccountEnabled"
+| project TimeGenerated, ModifiedUser, ModifiedBy, OperationName
+| join kind=leftanti (
+    AuditLogs
+    | where TimeGenerated > ago(24h)
+    | where OperationName has "Add member to group"
+    | where Result == "success"
+    | extend GroupName = tostring(TargetResources[0].displayName)
+    | where GroupName == "HLX-Offboarding"
+    | extend GroupUser = tostring(TargetResources[1].userPrincipalName)
+    | where isnotempty(GroupUser)
+    | project GroupUser
+  ) on $left.ModifiedUser == $right.GroupUser
+| extend ThreatType = "Offboarding Workflow Bypass"
+| project TimeGenerated, ModifiedUser, ModifiedBy, OperationName, ThreatType

@@ -1,0 +1,10 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(1h)
+| where ErrorCode == 0
+| project AccountUpn, IPAddress, Country, Timestamp
+| summarize Locations = make_set(Country), IPs = make_set(IPAddress), FirstSeen = min(Timestamp), LastSeen = max(Timestamp), SigninCount = count() by AccountUpn
+| where array_length(Locations) > 1
+| extend TimeDiffMinutes = datetime_diff('minute', LastSeen, FirstSeen)
+| where TimeDiffMinutes < 60
+| extend ThreatType = "Impossible Travel"
+| project AccountUpn, Locations, IPs, TimeDiffMinutes, ThreatType, FirstSeen, LastSeen

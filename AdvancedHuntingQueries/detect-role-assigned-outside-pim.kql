@@ -1,0 +1,7 @@
+﻿// Note: Advanced Hunting does not have a direct AuditLogs equivalent.
+// This rule is best kept in Microsoft Sentinel using AuditLogs.
+// Placeholder query – replace with Sentinel rule.
+AuditLogs
+| where TimeGenerated > ago(24h)
+| where Category == "RoleManagement"
+| take 10

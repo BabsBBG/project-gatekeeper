@@ -1,0 +1,8 @@
+﻿EntraIdSignInEvents
+| where Timestamp > ago(1h)
+| where ErrorCode == 0
+| where IPAddress startswith "10.20.1."
+| summarize SigninCount = count(), UniqueUsers = dcount(AccountUpn), UserList = make_set(AccountUpn) by bin(Timestamp, 15m)
+| where SigninCount > 10 or UniqueUsers > 3
+| extend ThreatType = "Pulse Partner Network Anomaly"
+| project Timestamp = bin(Timestamp, 15m), SigninCount, UniqueUsers, UserList, ThreatType

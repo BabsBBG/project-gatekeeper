@@ -1,0 +1,22 @@
+// Rule: Mass Group Membership Changes
+// Severity: High | Tactic: Privilege Escalation
+// Bulk additions to sensitive groups
+// especially HLX-IT-Admins
+// Data source: AuditLogs (directory events)
+// Note: Not available in Advanced Hunting
+
+AuditLogs
+| where TimeGenerated > ago(1h)
+| where OperationName has "Add member to group"
+| where Result == "success"
+| extend ModifiedGroup = tostring(TargetResources[0].displayName)
+| extend AddedUser = tostring(TargetResources[1].userPrincipalName)
+| extend ModifiedBy = tostring(InitiatedBy.user.userPrincipalName)
+| where isnotempty(AddedUser) and isnotempty(ModifiedGroup)
+| summarize
+    Changes = count(),
+    AddedUsers = make_set(AddedUser)
+  by ModifiedGroup, ModifiedBy, bin(TimeGenerated, 15m)
+| where Changes >= 3 or ModifiedGroup in ("HLX-IT-Admins", "HLX-PIM-Approvers", "HLX-Break-Glass")
+| extend ThreatType = "Mass Group Membership Change"
+| project TimeGenerated = bin(TimeGenerated, 15m), ModifiedGroup, ModifiedBy, Changes, AddedUsers, ThreatType

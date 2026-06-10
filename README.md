@@ -7,24 +7,33 @@
 
 ---
 
-## Project Overview
+## Overview – The Real Story
 
-**The problem:**  
-Helix Communications, a UK ISP, acquired Pulse Networks, a smaller regional ISP. Overnight, the identity attack surface doubled: Pulse had no MFA, stale accounts, standing admin privileges, unmanaged contractors, and zero detection capability.
+Years ago, I worked the NOC floor for Legend Internet, a Nigerian ISP. We watched our biggest rival, Spectranet, eat into our subscriber base. Then, in March 2026, Legend announced plans to merge with Spectranet – a real telecom merger with all the identity chaos that comes with it.
 
-**The solution:**  
-Project Gatekeeper is a complete identity security overhaul built in a live Microsoft lab. Six phases, 14 custom KQL detection rules, 10 live attack simulations, and a SOAR playbook that contains a compromised account in under 60 seconds.
+**Project Gatekeeper** simulates that exact scenario. Helix Communications, a UK ISP, acquires Pulse Networks. Overnight, the identity attack surface doubles:
 
-**Key results:**  
-- MFA registration: 0% → 100%  
-- Legacy authentication: blocked  
-- Privileged roles: permanent → JIT with approval  
-- Detection rules: 14 custom KQL  
-- Automated response: SOAR playbook (2.42 second containment)  
-- Identity Secure Score: 46.67% → 32.04% (rising to >70% after full enforcement)
+- 400+ Pulse identities – inconsistent naming, no offboarding process
+- No MFA on legacy accounts
+- Stale accounts and over-privileged users
+- Unmanaged contractors and partner access
+- Zero detection or automated response
 
-**What you'll see in this walkthrough:**  
-Every control I built, from tenant hardening to automated response – with screenshots at each step.
+I built a complete identity security framework to fix this. Six phases, 14 custom KQL detection rules, 10 live attack simulations, and a SOAR playbook that contains a compromised account in **under 60 seconds**.
+
+**Key results:**
+
+| Metric | Before (Pulse legacy) | After (Helix unified) |
+|--------|----------------------|------------------------|
+| MFA registration | 0% | **100%** |
+| Legacy authentication | Enabled | **Blocked** |
+| Privileged roles | Permanent Global Admin | **JIT with approval** |
+| Custom detection rules | None | **14 KQL rules** |
+| Automated response | None | **SOAR playbook** |
+| Containment time | Hours | **<60 seconds** |
+| Identity Secure Score | N/A | **32% (rising)** |
+
+This walkthrough shows exactly how I built it – with screenshots at every step.
 
 ---
 
@@ -34,7 +43,7 @@ Every control I built, from tenant hardening to automated response – with scre
 
 ### 1.1 Create security groups
 
-7 groups: IT Admins, NOC Engineers, Corporate Staff, Field Ops, Break-Glass, PIM Approvers, and Pulse Legacy Users.
+Seven groups: IT Admins, NOC Engineers, Corporate Staff, Field Ops, Break-Glass, PIM Approvers, and Pulse Legacy Users.
 
 ![Groups list](Phase%201/phase1-task2-groups-list.png)
 
@@ -46,33 +55,31 @@ Two accounts (`bg-01`, `bg-02`) with permanent Global Admin. Credentials stored 
 
 ### 1.3 Bulk user creation (PowerShell)
 
-16 users: Helix staff + Pulse legacy accounts.  
-Each Pulse account had a specific problem: no MFA, stale, over-privileged, or unlicensed.
+Sixteen users: Helix staff + Pulse legacy accounts. Each Pulse account had a specific problem: no MFA, stale, over-privileged, or unlicensed.
 
 ![PowerShell creation](Phase%201/phase1-task4-powershell-creation.png)
 
 ### 1.4 Licensing and authentication methods
 
-Assigned M365 E5 licences.  
-Hardened authentication: Microsoft Authenticator, FIDO2, TAP – no SMS or voice calls.
+Assigned M365 E5 licences. Hardened authentication: Microsoft Authenticator, FIDO2, TAP – no SMS or voice calls.
 
 ![Auth methods](Phase%201/phase1-task6-auth-methods.png)
 
 ### 1.5 Self-service password reset (SSPR)
 
-Enabled for all users, 2 methods required.
+Enabled for all users, two methods required.
 
 ![SSPR methods](Phase%201/phase1-task7-sspr-methods.png)
 
 ### 1.6 Pulse legacy gaps – documented and fixed
 
-- Disabled stale account `pls-jakub.kiwior`  
+- Disabled stale account `pls-jakub.kiwior`
 - Removed direct roles from `pls-reiss.nelson` (AI Reader, Directory Readers)
 
-![Kiwior disabled](Phase%201/phase1-task8-kiwior-disabled.png)  
+![Kiwior disabled](Phase%201/phase1-task8-kiwior-disabled.png)
 ![Nelson roles before removal](Phase%201/phase1-task8-nelson-roles.png)
 
-**Result:** Secure Score baseline = 46.67% after 24 hours.
+**Result:** A clean baseline with documented Pulse legacy risks. Identity Secure Score: N/A → 46.67% after 24 hours.
 
 ---
 
@@ -82,7 +89,7 @@ Enabled for all users, 2 methods required.
 
 ### 2.1 Named locations
 
-5 locations: Helix HQ, NOC floor (trusted IP), Field Ops, Pulse Legacy Office (not trusted), Pulse Partner Network (not trusted).
+Five locations: Helix HQ, NOC floor (trusted IP), Field Ops, Pulse Legacy Office (not trusted), Pulse Partner Network (not trusted).
 
 ![Named locations](Phase%202/phase2-task1-named-locations.png)
 
@@ -110,23 +117,23 @@ All policies started in report-only mode (industry best practice) and were later
 
 ### 3.1 Role settings
 
-- Global Admin: 4 hours, MFA, approval required  
-- Security Admin: 8 hours, MFA, no approval  
+- Global Admin: 4 hours, MFA, **approval required**
+- Security Admin: 8 hours, MFA, no approval
 - Privileged Role Admin: 4 hours, MFA, approval required
 
 ![Global Admin settings](Phase%203/phase3-task2-globaladmin-settings.png)
 
 ### 3.2 Eligible assignments
 
-- Martin Odegaard → Global Admin  
-- Declan Rice → Security Admin  
+- Martin Odegaard → Global Admin
+- Declan Rice → Security Admin
 - William Saliba → Privileged Role Admin
 
 ![Eligible assignments](Phase%203/phase3-task3-eligible-assignments.png)
 
 ### 3.3 Approver group (separation of duties)
 
-HLX-PIM-Approvers = Jurrien Timber + Kai Havertz (corporate staff, not IT Admins).
+HLX-PIM-Approvers = Jurrien Timber + Kai Havertz (corporate staff, **not** IT Admins).
 
 ![PIM approvers group](Phase%203/phase3-task4-pim-approvers-group.png)
 
@@ -140,7 +147,7 @@ Global Administrator role reviewed monthly by Timber. Auto-remove if not approve
 
 Odegaard requested Global Admin → Timber approved. Full audit trail.
 
-![Activation request](Phase%203/phase3-task9-activation-request.png)  
+![Activation request](Phase%203/phase3-task9-activation-request.png)
 ![Timber approval](Phase%203/phase3-task9-timber-approval.png)
 
 ---
@@ -172,12 +179,14 @@ Tasks: Disable account, remove all groups, strip licences, notify manager (befor
 
 ### 4.4 Live tests
 
-- Viktor Gyokeres onboarded – TAP generated ✓  
-- Gabriel Martinelli transferred from Field Ops to Corporate – manager notified ✓  
+- Viktor Gyokeres onboarded – TAP generated ✓
+- Gabriel Martinelli transferred from Field Ops to Corporate – manager notified ✓
 - Albert Lokonga offboarded – account disabled ✓
 
-![Leaver test](Phase%204/phase4-task7-leaver-test.png)  
+![Leaver test](Phase%204/phase4-task7-leaver-test.png)
 ![Lokonga disabled](Phase%204/phase4-task7-lokonga-disabled.png)
+
+The Leaver workflow doubles as an **emergency containment action**. When a compromised account is added to HLX-Offboarding, the workflow fires within seconds.
 
 ---
 
@@ -227,7 +236,7 @@ All in `/kql-queries/`. Five key examples:
    ![MFA fatigue logs](Phase%205/phase5-sim7-mfa-fatigue-signin-logs.png)
 
 8. **Legacy authentication** – PowerShell Basic Auth to MAPI endpoint → 401 Unauthorized (CA002 blocked it)  
-   ![Legacy auth 401](Phase%205/phase5-sin8-legacy-auth-401.png)
+   ![Legacy auth 401](Phase%205/phase5-sim8-legacy-auth-401.png)
 
 9. **Impossible travel** – Signed in from Nigeria → US → Belgium via VPN – logs show three countries in minutes  
    ![Impossible travel advanced hunting](Phase%205/phase5-sim9-impossible-travel-advanced-hunting.png)
@@ -236,6 +245,8 @@ All in `/kql-queries/`. Five key examples:
     ![PIM activation audit](Phase%205/phase5-sim10-pim-activation-audit.png)
 
 > "A KQL rule that fires but does nothing is a ticket generator. A Sentinel incident that triggers a Logic Apps playbook that revokes, disables, and offboards – that's security."
+
+Every simulation generated real log entries that matched the KQL queries – proving detection logic is sound.
 
 ---
 
@@ -251,7 +262,7 @@ No more report-only. All 7 policies = On.
 
 ### 6.2 Run access reviews
 
-- Global Admin monthly – Timber approved Odegaard ✓  
+- Global Admin monthly – Timber approved Odegaard ✓
 - Pulse Legacy quarterly – scope = guest users only (PLS-Legacy-Users) ✓
 
 ![Access review approval](Phase%206/phase6-task2-access-review-approval.png)
@@ -260,12 +271,13 @@ No more report-only. All 7 policies = On.
 
 Log Analytics workspace (`hlx-law-sentinel`). Connected Entra ID logs. Added all 14 KQL rules as scheduled analytics rules.
 
-![LAW workspace](Phase%206/phase6-task4-la-workspace.png)  
+![LAW workspace](Phase%206/phase6-task4-la-workspace.png)
+![Sentinel overview](Phase%206/phase6-task5-sentinel-overview.png)
 ![All analytics rules](Phase%206/phase6-task4-all-analytics-rules.png)
 
 ### 6.4 Build the SOAR playbook (Logic Apps)
 
-**Trigger:** HTTP webhook (lab workaround – production uses Sentinel incident trigger).  
+**Trigger:** HTTP webhook (lab workaround – production would use Sentinel incident trigger).  
 **Workflow:**  
 1. Check if account is break-glass (bg-01 or bg-02)  
 2. If NOT break-glass:  
@@ -273,62 +285,53 @@ Log Analytics workspace (`hlx-law-sentinel`). Connected Entra ID logs. Added all
    - Disable account  
    - Add to HLX-Offboarding (triggers Leaver workflow)  
    - Send SOC alert email  
-3. If break-glass: only send alert – NO auto-block
+3. If break-glass: only send alert – **NO auto-block**
 
-![Logic App workflow](Phase%206/phase6-task5-lobigapp-workflow.png)
+![Logic App workflow](Phase%206/phase6-task5-logicapp-workflow.png)
 
 ### 6.5 Test the playbook – compromised account
 
 **Attacker:** pls-oleksandr.zinchenko (Pulse legacy)  
-**Action:** revoke, disable, offboard, email – all completed in 2.42 seconds.
+**Action:** revoke, disable, offboard, email – all completed in **2.42 seconds**.
 
-![Logic Apps run history](Phase%206/phase6-task5-logicapp-run-history.png)  
-![Account disabled](Phase%206/phase6-task5-account-disabled.png)  
-![Offboarding group member](Phase%206/phase6-task5-offboarding-group-member.png)  
+![Logic Apps run history](Phase%206/phase6-task5-logicapp-run-history.png)
+![Account disabled](Phase%206/phase6-task5-account-disabled.png)
+![Offboarding group member](Phase%206/phase6-task5-offboarding-group-member.png)
 ![SOC alert email](Phase%206/phase6-task5-soc-alert-email.png)
 
 ### 6.6 Test the break-glass exclusion
 
-bg-01 accessed → alert sent, account NOT disabled (correct).
+bg-01 accessed → alert sent, **account NOT disabled** (correct).
 
-![Break-glass alert email](Phase%206/phase6-task5-breachalglass-alert-email.png)  
-![Break-glass still enabled](Phase%206/phase6-task5-breachalglass-still-enabl.png)
+![Break-glass alert email](Phase%206/phase6-task5-breakglass-alert-email.png)
+![Break-glass still enabled](Phase%206/phase6-task5-breakglass-still-enabled.png)
 
 ### 6.7 Final Secure Score
 
 32.04% (baseline was 46.67% – score recalculates after enforcement; expected to rise above 70%).
 
-![Final Secure Score](Phase%206/phase6-task6-fin-al-secure-score.png)
-
----
-
-## The Results
-
-| Metric | Before | After |
-|--------|--------|-------|
-| MFA registration | 0% | 100% |
-| Legacy authentication | Enabled | Blocked |
-| Privileged roles | Permanent | JIT + approval |
-| Custom detection rules | None | 14 KQL rules |
-| Automated response | None | SOAR playbook |
-| Containment time | Hours | <60 seconds |
-
-The real outcome: A compromised account triggers detection, enforcement, and full containment – all without human intervention – in under a minute.
+![Final Secure Score](Phase%206/phase6-task6-final-secure-score.png)
 
 ---
 
 ## What I Learned (the hard way)
 
-- **Lifecycle Workflows need Entra ID Governance** – a separate trial licence.  
-- **Access reviews** – trial tenants don't always show them in the My Access portal, but the email link works.  
-- **Sentinel entity extraction is unreliable in trial workspaces** – I had to use an HTTP webhook trigger for the playbook. In production, the native trigger works perfectly.
+- **Lifecycle Workflows need Entra ID Governance** – a separate trial licence. I activated the free trial and it unlocked immediately.
+- **Access reviews** – trial tenants don't always show them in the My Access portal, but the email link works. The configuration itself is correct.
+- **Sentinel entity extraction is unreliable in trial workspaces** – the "Entities – Get Accounts" action returned empty. I switched to an HTTP webhook trigger and passed the UPN directly. In a production Sentinel workspace, the native trigger works perfectly.
 
 ---
 
 ## Reproduce This Project
 
-All code is in this repo: Terraform, KQL rules, PowerShell scripts, and the Logic Apps ARM template.  
-See the `terraform/`, `kql-queries/`, `scripts/`, and `logic-apps/` folders.
+All code is in this repository:
+
+- `/terraform/` – Groups, users, CA policies, PIM assignments, Sentinel workspace
+- `/kql-queries/` – 14 KQL detection rules
+- `/scripts/` – PowerShell user creation script
+- `/logic-apps/` – ARM template for the SOAR playbook
+
+Clone the repo, set up a fresh M365 E5 trial, and run Terraform. See the `terraform/terraform.tfvars.example` file for required variables.
 
 ---
 

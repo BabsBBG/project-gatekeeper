@@ -67,7 +67,7 @@
                                             "tenant": "bbgseclab.onmicrosoft.com",
                                             "audience": "https://graph.microsoft.com",
                                             "clientId": "3f812b28-9567-40bb-8db0-f98f126ec670",
-                                            "secret": "0rp8Q~WbQGNKK~r1s89kmefNXLsmAcSRq2DoTb6I"
+                                            "secret": ""
                                         }
                                     }
                                 },
@@ -110,7 +110,7 @@
                                             "tenant": "bbgseclab.onmicrosoft.com",
                                             "audience": "https://graph.microsoft.com",
                                             "clientId": "3f812b28-9567-40bb-8db0-f98f126ec670",
-                                            "secret": "0rp8Q~WbQGNKK~r1s89kmefNXLsmAcSRq2DoTb6I"
+                                            "secret": ""
                                         }
                                     }
                                 },

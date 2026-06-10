@@ -28,11 +28,11 @@
 
 ## The Real Story
 
-Years ago I worked the NOC floor for Legend Internet, a Nigerian ISP. I watched our biggest competitor, Spectranet, eat into our subscriber base for years. Then in March 2026, Legend announced plans to merge with Spectranet — a real telecom acquisition with all the identity chaos that comes with it.
 
-Project Gatekeeper simulates that exact scenario. Helix Communications, a UK ISP, acquires Pulse Networks. Overnight, the identity attack surface doubles:
 
-- 400+ Pulse identities — inconsistent naming, no offboarding process
+Project Gatekeeper simulates a fictional telecom acquisition with all the identity chaos that comes with it. Helix Communications, a UK ISP, acquires Pulse Networks. Overnight, the identity attack surface doubles:
+
+- 400+ Pulse identities - inconsistent naming, no offboarding process
 - No MFA on legacy accounts
 - Stale accounts and over-privileged users
 - Unmanaged contractor and partner access
@@ -43,10 +43,10 @@ I built a complete identity security framework to fix this. Six phases, 14 custo
 | Metric | Before | After |
 |---|---|---|
 | MFA enforcement | 0% | **100% via CA001** |
-| Legacy authentication | Enabled | **Blocked — CA002** |
+| Legacy authentication | Enabled | **Blocked - CA002** |
 | Privileged roles | Permanent Global Admin | **JIT with dual approval** |
 | Custom detection rules | None | **14 KQL rules** |
-| Incident response | Manual — hours | **SOAR — under 3 seconds** |
+| Incident response | Manual - hours | **SOAR - under 3 seconds** |
 | Identity Secure Score | N/A | **32.04%** |
 
 ---
@@ -87,13 +87,13 @@ I built a complete identity security framework to fix this. Six phases, 14 custo
 ```
 ---
 
-## Phase 1 — Identity Baseline
+## Phase 1 - Identity Baseline
 
 **Goal:** Understand what Pulse brought in, then lock down the foundation before a single legacy identity touches the Helix environment.
 
 ### Security Groups
 
-Seven groups: IT Admins, NOC Engineers, Corporate Staff, Field Ops, Break-Glass, PIM Approvers, and Pulse Legacy Users. HLX-IT-Admins is role-assignable — required for PIM in Phase 3.
+Seven groups: IT Admins, NOC Engineers, Corporate Staff, Field Ops, Break-Glass, PIM Approvers, and Pulse Legacy Users. HLX-IT-Admins is role-assignable, required for PIM in Phase 3.
 
 ![Groups list](Phase%201/phase1-task2-groups-list.png)
 
@@ -126,21 +126,21 @@ Self-service password reset enabled for all users, two methods required.
 
 ### Pulse Legacy Gap Remediation
 
-- Disabled `pls-jakub.kiwior` — stale, no activity since acquisition close
-- Removed inherited AI Reader and Directory Readers roles from `pls-reiss.nelson` — assigned outside any governance framework
+- Disabled `pls-jakub.kiwior` - stale, no activity since acquisition close
+- Removed inherited AI Reader and Directory Readers roles from `pls-reiss.nelson` - assigned outside any governance framework
 
 ![Kiwior disabled](Phase%201/phase1-task8-kiwior-disabled.png)
 ![Nelson inherited roles](Phase%201/phase1-task8-nelson-roles.png)
 
 ---
 
-## Phase 2 — Conditional Access Architecture
+## Phase 2 - Conditional Access Architecture
 
-**Goal:** Control who can sign in, from where, and under what conditions — across two merged organisations with different risk profiles.
+**Goal:** Control who can sign in, from where, and under what conditions, across two merged organisations with different risk profiles.
 
 ### Named Locations
 
-Five locations defining the network topology. Helix-NOC-Floor is trusted. Both Pulse locations are known but not trusted — they generate additional scrutiny.
+Five locations defining the network topology. Helix-NOC-Floor is trusted. Both Pulse locations are known but not trusted, they generate additional scrutiny.
 
 ![Named locations](Phase%202/phase2-task1-named-locations.png)
 
@@ -148,15 +148,15 @@ Five locations defining the network topology. Helix-NOC-Floor is trusted. Both P
 
 | Policy | Scope | Control |
 |---|---|---|
-| CA001 | All users | Require MFA — break-glass excluded |
+| CA001 | All users | Require MFA - break-glass excluded |
 | CA002 | All users | Block legacy auth (ActiveSync, other clients) |
-| CA003 | All users — High/Medium sign-in risk | Require MFA + re-auth every time |
-| CA004 | All users — High user risk | MFA + forced password change |
+| CA003 | All users - High/Medium sign-in risk | Require MFA + re-auth every time |
+| CA004 | All users - High user risk | MFA + forced password change |
 | CA005 | HLX-IT-Admins | MFA + 4hr session, never persistent |
 | CA006 | Guest/contractor users | MFA + 1hr session |
 | CA007 | Pulse-Partner-Network location | MFA + 2hr session |
 
-All policies started in report-only mode and were moved to enforcement once the environment stabilised — standard enterprise deployment practice.
+All policies started in report-only mode and were moved to enforcement once the environment stabilised, standard enterprise deployment practice.
 
 ![CA policy list](Phase%202/phase2-task2-all-policies-list.png)
 ![CA001](Phase%202/phase2-task2-ca001-require-mfa.png)
@@ -166,7 +166,7 @@ All policies started in report-only mode and were moved to enforcement once the 
 
 ---
 
-## Phase 3 — Privileged Identity Management
+## Phase 3 - Privileged Identity Management
 
 **Goal:** Zero standing privilege. Every admin role activated just-in-time, with justification and where required, approval from someone outside the IT Admin tier.
 
@@ -174,9 +174,9 @@ All policies started in report-only mode and were moved to enforcement once the 
 
 | Role | Max Duration | MFA | Approval |
 |---|---|---|---|
-| Global Administrator | 4 hours | Required | Required — HLX-PIM-Approvers |
+| Global Administrator | 4 hours | Required | Required - HLX-PIM-Approvers |
 | Security Administrator | 8 hours | Required | Not required |
-| Privileged Role Administrator | 4 hours | Required | Required — HLX-PIM-Approvers |
+| Privileged Role Administrator | 4 hours | Required | Required - HLX-PIM-Approvers |
 
 ![Global Admin settings](Phase%203/phase3-task2-globaladmin-settings.png)
 
@@ -188,7 +188,7 @@ Odegaard → Global Admin. Rice → Security Admin. Saliba → Privileged Role A
 
 ### Separation of Duties
 
-HLX-PIM-Approvers consists of Jurrien Timber and Kai Havertz — Corporate staff, not IT Admins. They cannot approve their own requests because they have none to approve.
+HLX-PIM-Approvers consists of Jurrien Timber and Kai Havertz, Corporate staff, not IT Admins. They cannot approve their own requests because they have none to approve.
 
 ![PIM approvers group](Phase%203/phase3-task4-pim-approvers-group.png)
 ![Global Admin approvers configured](Phase%203/phase3-task4-globaladmin-approvers.png)
@@ -208,13 +208,13 @@ Odegaard requested Global Admin → Timber approved from outside the IT Admin ti
 
 ---
 
-## Phase 4 — Identity Lifecycle: JML Workflows
+## Phase 4 - Identity Lifecycle: JML Workflows
 
 **Goal:** Replace manual helpdesk tickets with automated lifecycle workflows that respond in seconds, not days.
 
 ### Joiner
 
-Trigger: user added to `HLX-New-Joiners`. Tasks: Generate Temporary Access Pass, assign default group, send welcome email. The TAP lets new users register MFA without an existing credential — breaking the circular dependency that would otherwise require a helpdesk call.
+Trigger: user added to `HLX-New-Joiners`. Tasks: Generate Temporary Access Pass, assign default group, send welcome email. The TAP lets new users register MFA without an existing credential, breaking the circular dependency that would otherwise require a helpdesk call.
 
 ![Joiner workflow](Phase%204/phase4-task2-joiner-workflow.png)
 ![Joiner test](Phase%204/phase4-task5-joiner-test.png)
@@ -238,11 +238,11 @@ The leaver workflow also serves as an **emergency containment trigger**. The SOA
 
 ---
 
-## Phase 5 — ITDR: Threat Detection
+## Phase 5 - ITDR: Threat Detection
 
 **Goal:** Build detection rules that catch Pulse-specific threats, then prove they work with live evidence.
 
-### 14 Custom KQL Rules — MITRE ATT&CK Mapped
+### 14 Custom KQL Rules - MITRE ATT&CK Mapped
 
 All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-queries/`](kql-queries/).
 
@@ -267,13 +267,13 @@ All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-qu
 
 ### 10 Live Attack Simulations
 
-> *A KQL rule that fires but does nothing is a ticket generator. A Sentinel incident that triggers a Logic Apps playbook that revokes, disables, and offboards — that's security.*
+> *A KQL rule that fires but does nothing is a ticket generator. A Sentinel incident that triggers a Logic Apps playbook that revokes, disables, and offboards - that's security.*
 
 Every simulation generated real log entries in the Helix tenant. Advanced Hunting and Entra audit log evidence was captured for 12 of 14 rules.
 
 ---
 
-**Simulation 1 — Credential Harvest** (Rules 1, 5)
+**Simulation 1 - Credential Harvest** (Rules 1, 5)
 
 Attack Simulation Training launched against all four Pulse legacy accounts. Real phishing campaign — real sign-in activity logged.
 
@@ -282,15 +282,15 @@ Attack Simulation Training launched against all four Pulse legacy accounts. Real
 
 ---
 
-**Simulation 2 — Password Spray** (Rule 2)
+**Simulation 2 - Password Spray** (Rule 2)
 
-Manual failed logins cycled across all four Pulse accounts from the same browser and IP. Multiple failed attempts, multiple targets, short time window — the signature spray pattern.
+Manual failed logins cycled across all four Pulse accounts from the same browser and IP. Multiple failed attempts, multiple targets, short time window, the signature spray pattern.
 
 ![Password spray logs](Phase%205/phase5-sim2-password-spray-logs.png)
 
 ---
 
-**Simulation 3 — Role Assigned Outside PIM** (Rule 4)
+**Simulation 3 - Role Assigned Outside PIM** (Rule 4)
 
 Direct Security Reader assignment to a Pulse legacy user bypassing PIM entirely. Audit log captured the assignment. Role removed immediately after.
 
@@ -298,18 +298,18 @@ Direct Security Reader assignment to a Pulse legacy user bypassing PIM entirely.
 
 ---
 
-**Simulation 4 — Mass Group Membership Change** (Rule 9)
+**Simulation 4 - Mass Group Membership Change** (Rule 9)
 
-Added three users simultaneously to HLX-IT-Admins. Audit log shows bulk additions in a single 15-minute window — the pattern Rule 9 targets.
+Added three users simultaneously to HLX-IT-Admins. Audit log shows bulk additions in a single 15-minute window, the pattern Rule 9 targets.
 
 ![Mass group change audit](Phase%205/phase5-sim4-mass-group-change-audit1.png)
 ![Mass group change detail](Phase%205/phase5-sim4-mass-group-change-audit2.png)
 
 ---
 
-**Simulation 5 — Break-Glass Account Access** (Rule 13)
+**Simulation 5 - Break-Glass Account Access** (Rule 13)
 
-Signed in as bg-01 from an incognito window. CA policies correctly showed Not Applied — break-glass exclusion working. Identity Protection flagged the unfamiliar IP and interrupted the flow, but the sign-in completed. This is the correct behaviour — emergency access must never auto-block.
+Signed in as bg-01 from an incognito window. CA policies correctly showed Not Applied, break-glass exclusion working. Identity Protection flagged the unfamiliar IP and interrupted the flow, but the sign-in completed. This is the correct behaviour, emergency access must never auto-block.
 
 ![Break-glass signin](Phase%205/phase5-sim5-breakglass-signin.png)
 ![CA policies not applied](Phase%205/phase5-sim5-breakglass-ca-not-applied.png)
@@ -318,51 +318,51 @@ Signed in as bg-01 from an incognito window. CA policies correctly showed Not Ap
 
 ---
 
-**Simulation 6 — Offboarding Workflow Bypass** (Rule 10)
+**Simulation 6 - Offboarding Workflow Bypass** (Rule 10)
 
-Disabled pls-reiss.nelson directly without adding to HLX-Offboarding first. Audit log shows AccountEnabled changed to false with no preceding offboarding group entry. Then attempted sign-in on the disabled account — 50057 error confirmed.
+Disabled pls-reiss.nelson directly without adding to HLX-Offboarding first. Audit log shows AccountEnabled changed to false with no preceding offboarding group entry. Then attempted sign-in on the disabled account, 50057 error confirmed.
 
 ![Offboarding bypass audit](Phase%205/phase5-sim6-offboarding-bypass-audit.png)
 ![Account locked 50057](Phase%205/phase5-sim6-account-locked.png)
 
 ---
 
-**Simulation 7 — MFA Fatigue** (Rule 6)
+**Simulation 7 - MFA Fatigue** (Rule 6)
 
-Repeatedly signed in as Bukayo Saka and denied the MFA push each time. Sign-in logs show the Interrupted → Interrupted → Interrupted → Success pattern — exactly what push bombing looks like in logs.
+Repeatedly signed in as Bukayo Saka and denied the MFA push each time. Sign-in logs show the Interrupted → Interrupted → Interrupted → Success pattern, exactly what push bombing looks like in logs.
 
 ![MFA fatigue sign-in logs](Phase%205/phase5-sim7-mfa-fatigue-signin-logs.png)
 ![MFA fatigue Advanced Hunting](Phase%205/phase5-sim7-mfa-fatigue-advanced-hunting.png)
 
 ---
 
-**Simulation 8 — Legacy Authentication** (Rule 7)
+**Simulation 8 - Legacy Authentication** (Rule 7)
 
-PowerShell sent a Basic Auth HTTP request to the Exchange MAPI endpoint. 401 Unauthorized — CA002 blocked it at the protocol level.
+PowerShell sent a Basic Auth HTTP request to the Exchange MAPI endpoint. 401 Unauthorized, CA002 blocked it at the protocol level.
 
 ![Legacy auth 401](Phase%205/phase5-sim8-legacy-auth-401.png)
 
 ---
 
-**Simulation 9 — Impossible Travel** (Rules 1, 12)
+**Simulation 9 - Impossible Travel** (Rules 1, 12)
 
 Signed in as pls-oleksandr.zinchenko from Nigeria, then immediately via VPN from the US and Belgium. Three countries in minutes. Sign-in logs and Advanced Hunting both capture the pattern.
 
 ![Impossible travel Advanced Hunting](Phase%205/phase5-sim9-impossible-travel-advanced-hunting.png)
 
-> CA003 did not block this sign-in — and that is correct. Impossible travel is a post-sign-in detection. Both sign-in events must occur before the pattern can be calculated. By the time Identity Protection scores it, the session exists. CA004 catches the elevated user risk on the next sign-in. This is how the detection chain is designed.
+> CA003 did not block this sign-in and that is correct. Impossible travel is a post-sign-in detection. Both sign-in events must occur before the pattern can be calculated. By the time Identity Protection scores it, the session exists. CA004 catches the elevated user risk on the next sign-in. This is how the detection chain is designed.
 
 ---
 
-**Simulation 10 — PIM Activation Anomaly** (Rule 11)
+**Simulation 10 - PIM Activation Anomaly** (Rule 11)
 
-Odegaard activated Global Administrator. Full PIM audit log captured with timestamp — the evidence Rule 11 queries for out-of-window activations.
+Odegaard activated Global Administrator. Full PIM audit log captured with timestamp, the evidence Rule 11 queries for out-of-window activations.
 
 ![PIM activation audit](Phase%205/phase5-sim10-pim-activation-audit.png)
 
 ---
 
-**VPN Risky Sign-in** (Baseline evidence — Rules 1, 5)
+**VPN Risky Sign-in** (Baseline evidence - Rules 1, 5)
 
 The first foreign VPN test that kicked off the detection work. Identity Protection flagged the sign-in, CA003 enforced MFA, and the risky sign-ins dashboard populated for the first time.
 
@@ -372,7 +372,7 @@ The first foreign VPN test that kicked off the detection work. Identity Protecti
 
 ---
 
-## Phase 6 — Response Automation and Governance
+## Phase 6 - Response Automation and Governance
 
 **Goal:** Close the detection-to-response loop. Prove the whole system works end-to-end.
 
@@ -384,7 +384,7 @@ No more report-only. All 7 policies enforced.
 
 ### Access Reviews
 
-Global Admin monthly review — Timber approved Odegaard. Pulse legacy quarterly review configured for external identities.
+Global Admin monthly review - Timber approved Odegaard. Pulse legacy quarterly review configured for external identities.
 
 ![Access review approval](Phase%206/phase6-task2-access-review-approval.png)
 ![Pulse legacy review](Phase%206/phase6-task3-pulse-legacy-review.png)
@@ -399,7 +399,7 @@ Log Analytics workspace created. Entra ID, MDI, and M365 Defender data connector
 
 ### SOAR Playbook: HLX-SOAR-HighRiskResponse
 
-**Trigger:** HTTP webhook — lab implementation. Production uses Sentinel incident automation rule.
+**Trigger:** HTTP webhook - lab implementation. Production uses Sentinel incident automation rule.
 
 ```
 Incident fires
@@ -429,7 +429,7 @@ Full containment — 2.42 seconds
 
 ![Logic App workflow](Phase%206/phase6-task5-logicapp-workflow.png)
 
-### Live Test — pls-oleksandr.zinchenko
+### Live Test - pls-oleksandr.zinchenko
 
 Playbook triggered via PowerShell webhook. All steps executed in 2.42 seconds.
 
@@ -447,7 +447,7 @@ bg-01 submitted to the playbook. Account not touched. P1 alert sent.
 
 ### Final Secure Score
 
-32.04% post-acquisition, with the full control stack active. The score reflects bringing 400+ Pulse accounts into the MFA registration calculation — expected to climb above 70% as legacy users complete registration and controls continue to mature.
+32.04% post-acquisition, with the full control stack active. The score reflects bringing 400+ Pulse accounts into the MFA registration calculation, expected to climb above 70% as legacy users complete registration and controls continue to mature.
 
 ![Final Secure Score](Phase%206/phase6-task6-final-secure-score.png)
 
@@ -455,11 +455,11 @@ bg-01 submitted to the playbook. Account not touched. P1 alert sent.
 
 ## What I Learned the Hard Way
 
-**Lifecycle Workflows need Entra ID Governance** — a separate trial licence on top of E5. I activated the free trial and it unlocked immediately. Not obvious until you hit the 401 on the overview page.
+**Lifecycle Workflows need Entra ID Governance** - a separate trial licence on top of E5. I activated the free trial and it unlocked immediately. Not obvious until you hit the 401 on the overview page.
 
-**Access reviews in trial tenants** — the My Access portal sometimes doesn't surface PIM reviews for reviewers despite correct licence assignment and 24+ hours. The email notification with direct link works. The configuration is correct.
+**Access reviews in trial tenants** - the My Access portal sometimes doesn't surface PIM reviews for reviewers despite correct licence assignment and 24+ hours. The email notification with direct link works. The configuration is correct.
 
-**Sentinel entity extraction is unreliable in trial workspaces** — the built-in Entities - Get Accounts action consistently returned empty results for both analytics-rule-generated and manually created incidents. Switched to an HTTP webhook trigger and passed the UPN directly. In a production Sentinel workspace with sufficient ingestion history, the native trigger works correctly. The response chain logic — revoke, disable, offboard, notify — is fully validated regardless of trigger method.
+**Sentinel entity extraction is unreliable in trial workspaces** - the built-in Entities - Get Accounts action consistently returned empty results for both analytics-rule-generated and manually created incidents. Switched to an HTTP webhook trigger and passed the UPN directly. In a production Sentinel workspace with sufficient ingestion history, the native trigger works correctly. The response chain logic - revoke, disable, offboard, notify, is fully validated regardless of trigger method.
 
 ---
 
@@ -524,7 +524,7 @@ project-gatekeeper/
 
 <div align="center">
 
-**Built by Tobi Babalola** — now go secure something.
+**Built by Tobi Babalola** - now go secure something.
 
 [![GitHub](https://img.shields.io/badge/GitHub-BabsBBG-181717?style=flat&logo=github)](https://github.com/BabsBBG)
 

@@ -50,10 +50,12 @@ I built a complete identity security framework to fix this. Six phases, 14 custo
 | Identity Secure Score | N/A | **32.04%** |
 
 ---
+<img width="1448" height="1086" alt="Gatekeeper Architecture" src="https://github.com/user-attachments/assets/ac025ca2-c9c0-4085-909d-dcf4f182c9e6" />
 
 ## Architecture
 
 ```
+
 ┌------------------------------------------------------------------┐
 │                   HELIX COMMUNICATIONS TENANT                    │
 │                                                                   │

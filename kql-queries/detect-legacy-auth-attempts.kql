@@ -1,9 +1,8 @@
 // Rule: Legacy Authentication Attempts
 // Severity: Medium | Tactic: Defense Evasion
-// CA002 blocks legacy auth — this detects
-// attempts that hit the block
-// Confirms legacy clients still in use
-// post-migration
+// Detects legacy authentication attempts
+// for investigation and validation of
+// legacy client activity post-migration
 
 SigninLogs
 | where TimeGenerated > ago(24h)

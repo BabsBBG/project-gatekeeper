@@ -1,4 +1,4 @@
-// Rule: Impossible Travel Detection
+// Rule: Rapid Multi-Country Sign-ins
 // Severity: High | Tactic: Initial Access
 // Detects sign-ins from different countries
 // within 60 minutes for the same account
@@ -17,5 +17,5 @@ SigninLogs
 | where array_length(Locations) > 1
 | extend TimeDiffMinutes = datetime_diff('minute', LastSeen, FirstSeen)
 | where TimeDiffMinutes < 60
-| extend ThreatType = "Impossible Travel"
+| extend ThreatType = "Rapid Multi-Country Sign-ins"
 | project UserPrincipalName, Locations, IPs, TimeDiffMinutes, ThreatType, FirstSeen, LastSeen

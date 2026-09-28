@@ -1,4 +1,4 @@
-// Rule: Pulse Office + Impossible Travel
+// Rule: Pulse Account Rapid Multi-Country Sign-ins
 // Severity: High | Tactic: Initial Access
 // Sign-in from multiple countries within 2hrs
 // for accounts associated with Pulse migration

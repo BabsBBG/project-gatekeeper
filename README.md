@@ -44,7 +44,7 @@ I built a complete identity security framework to fix this. Six phases, 14 custo
 |---|---|---|
 | MFA enforcement | 0% | **100% via CA001** |
 | Legacy authentication | Enabled | **Blocked - CA002** |
-| Privileged roles | Permanent Global Admin | **JIT with dual approval** |
+| Privileged roles | Permanent Global Admin | **JIT with approval required** |
 | Custom detection rules | None | **14 KQL rules** |
 | Incident response | Manual - hours | **SOAR - under 3 seconds** |
 | Identity Secure Score | N/A | **32.04%** |
@@ -261,7 +261,7 @@ All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-qu
 | HLX-DETECT-009 | Mass Group Membership Change | **High** | Privilege Escalation | T1098.001 |
 | HLX-DETECT-010 | Offboarding Workflow Bypass | Medium | Defense Evasion | T1098 |
 | HLX-DETECT-011 | PIM Activation Outside Window | **High** | Privilege Escalation | T1078.004 |
-| HLX-DETECT-012 | Pulse Account Impossible Travel | **High** | Initial Access | T1078 |
+| HLX-DETECT-012 | Pulse Account Rapid Multi-Country Sign-ins | **High** | Initial Access | T1078 |
 | HLX-DETECT-013 | Pulse Partner Network Anomaly | Medium | Initial Access | T1078 |
 | HLX-DETECT-014 | Risk-Alert Correlation | **High** | Initial Access | T1078 |
 
@@ -340,7 +340,7 @@ Repeatedly signed in as Bukayo Saka and denied the MFA push each time. Sign-in l
 
 **Simulation 8 - Legacy Authentication** (Rule 7)
 
-PowerShell sent a Basic Auth HTTP request to the Exchange MAPI endpoint. 401 Unauthorized, CA002 blocked it at the protocol level.
+PowerShell sent a Basic Auth HTTP request to the Exchange MAPI endpoint. The request returned 401 Unauthorized, confirming that the legacy authentication attempt was unsuccessful.
 
 ![Legacy auth 401](Phase%205/phase5-sim8-legacy-auth-401.png)
 

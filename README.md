@@ -284,7 +284,7 @@ Attack Simulation Training launched against all four Pulse legacy accounts. Real
 
 ---
 
-**Simulation 2 - Password Spray** (Rule 2)
+**Simulation 2 - Password Spray (HLX-DETECT-003)**
 
 Manual failed logins cycled across all four Pulse accounts from the same browser and IP. Multiple failed attempts, multiple targets, short time window, the signature spray pattern.
 
@@ -309,7 +309,7 @@ Added three users simultaneously to HLX-IT-Admins. Audit log shows bulk addition
 
 ---
 
-**Simulation 5 - Break-Glass Account Access** (Rule 13)
+**Simulation 5 - Break-Glass Account Access (HLX-DETECT-001)** 
 
 Signed in as bg-01 from an incognito window. CA policies correctly showed Not Applied, break-glass exclusion working. Identity Protection flagged the unfamiliar IP and interrupted the flow, but the sign-in completed. This is the correct behaviour, emergency access must never auto-block.
 

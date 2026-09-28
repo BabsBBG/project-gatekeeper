@@ -20,7 +20,7 @@
 
 | Phases Built | CA Policies | KQL Detection Rules | Containment Time |
 |:---:|:---:|:---:|:---:|
-| **6** | **7** | **14** | **2.42 seconds** |
+| **6** | **7** | **14** | **Automated containment** |
 
 </div>
 
@@ -38,7 +38,7 @@ Project Gatekeeper simulates a fictional telecom acquisition with all the identi
 - Unmanaged contractor and partner access
 - Zero detection or automated response
 
-I built a complete identity security framework to fix this. Six phases, 14 custom KQL detection rules mapped to MITRE ATT&CK, 10 live attack simulations with evidence, and a SOAR playbook that contains a compromised account in **2.42 seconds**.
+I built a layered identity security framework to address these risks. Six phases, 14 custom KQL detection rules mapped to MITRE ATT&CK, 10 live attack simulations with evidence, and a SOAR playbook that automates compromised-account containment.
 
 | Metric | Before | After |
 |---|---|---|
@@ -242,8 +242,7 @@ The leaver workflow also serves as an **emergency containment trigger**. The SOA
 
 ## Phase 5 - ITDR: Threat Detection
 
-**Goal:** Build detection rules that catch Pulse-specific threats, then prove they work with live evidence.
-
+**Goal:** Build detection rules for Pulse-specific threat scenarios, then validate them through controlled simulations and captured evidence.
 ### 14 Custom KQL Rules - MITRE ATT&CK Mapped
 
 All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-queries/`](kql-queries/).
@@ -267,7 +266,7 @@ All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-qu
 
 ![KQL folder](Phase%205/phase5-task4-kql-folder.png)
 
-### 10 Live Attack Simulations
+### 10 controlled security simulations with captured evidence
 
 > *A KQL rule that fires but does nothing is a ticket generator. A Sentinel incident that triggers a Logic Apps playbook that revokes, disables, and offboards - that's security.*
 
@@ -376,7 +375,7 @@ The first foreign VPN test that kicked off the detection work. Identity Protecti
 
 ## Phase 6 - Response Automation and Governance
 
-**Goal:** Close the detection-to-response loop. Prove the whole system works end-to-end.
+**Goal:** Close the detection-to-response loop and validate the automated response workflow end-to-end.
 
 ### Enable All CA Policies
 
@@ -461,7 +460,7 @@ bg-01 submitted to the playbook. Account not touched. P1 alert sent.
 
 **Access reviews in trial tenants** - the My Access portal sometimes doesn't surface PIM reviews for reviewers despite correct licence assignment and 24+ hours. The email notification with direct link works. The configuration is correct.
 
-**Sentinel entity extraction is unreliable in trial workspaces** - the built-in Entities - Get Accounts action consistently returned empty results for both analytics-rule-generated and manually created incidents. Switched to an HTTP webhook trigger and passed the UPN directly. In a production Sentinel workspace with sufficient ingestion history, the native trigger works correctly. The response chain logic - revoke, disable, offboard, notify, is fully validated regardless of trigger method.
+**Sentinel entity extraction is unreliable in trial workspaces** - the built-in Entities - Get Accounts action consistently returned empty results for both analytics-rule-generated and manually created incidents. Switched to an HTTP webhook trigger and passed the UPN directly. The lab therefore used an HTTP webhook trigger with the UPN passed directly, rather than relying on native entity extraction. The response chain logic - revoke, disable, offboard, notify - was validated in the lab using the HTTP webhook trigger.
 
 ---
 

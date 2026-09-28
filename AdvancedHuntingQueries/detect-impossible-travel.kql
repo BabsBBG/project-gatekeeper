@@ -6,5 +6,5 @@
 | where array_length(Locations) > 1
 | extend TimeDiffMinutes = datetime_diff('minute', LastSeen, FirstSeen)
 | where TimeDiffMinutes < 60
-| extend ThreatType = "Impossible Travel"
+| extend ThreatType = "Rapid Multi-Country Sign-ins"
 | project AccountUpn, Locations, IPs, TimeDiffMinutes, ThreatType, FirstSeen, LastSeen

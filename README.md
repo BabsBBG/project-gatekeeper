@@ -42,13 +42,13 @@ I built a complete identity security framework to fix this. Six phases, 14 custo
 
 | Metric | Before | After |
 |---|---|---|
-| MFA enforcement | 0% | **100% via CA001** |
-| Legacy authentication | Enabled | **Blocked - CA002** |
+| MFA enforcement | 0% | **CA001 configured to require MFA** |
+| Legacy authentication | Enabled | **CA002 configured to block legacy authentication** |
 | Privileged roles | Permanent Global Admin | **JIT with approval required** |
 | Custom detection rules | None | **14 KQL rules** |
-| Incident response | Manual - hours | **SOAR - under 3 seconds** |
+| Incident response | Manual - hours | **Automated SOAR response tested** |
 | Identity Secure Score | N/A | **32.04%** |
-
+ 
 ---
 <img width="1448" height="1086" alt="Gatekeeper Architecture" src="https://github.com/user-attachments/assets/ac025ca2-c9c0-4085-909d-dcf4f182c9e6" />
 

@@ -18,5 +18,5 @@ SigninLogs
 | where array_length(Locations) > 1
 | extend TimeDiff = datetime_diff('minute', LastSeen, FirstSeen)
 | where TimeDiff < 120
-| extend ThreatType = "Pulse Account Impossible Travel"
+| extend ThreatType = "Pulse Account Rapid Multi-Country Sign-ins"
 | project UserPrincipalName, Locations, IPs, TimeDiff, ThreatType, FirstSeen, LastSeen

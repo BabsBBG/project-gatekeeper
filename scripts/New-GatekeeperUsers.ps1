@@ -10,7 +10,7 @@
 #>
 
 # Parameters
-$initialPassword = "Helix@Gatekeeper2026!"
+$initialPassword = ""
 $tenantDomain = "bbgseclab.onmicrosoft.com"
 
 # Ensure the Microsoft.Graph module is installed

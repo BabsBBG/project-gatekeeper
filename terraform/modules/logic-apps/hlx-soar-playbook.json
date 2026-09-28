@@ -131,7 +131,7 @@
                                         "body": {
                                             "To": "admin@bbgseclab.onmicrosoft.com",
                                             "Subject": "SECURITY ALERT: Account Auto-Contained",
-                                            "Body": "<p class=\"editor-paragraph\">AUTOMATED SECURITY RESPONSE — PROJECT GATEKEEPER<br><br>Account contained: @{triggerBody()?['upn']}<br>Incident ID: @{triggerBody()?['incidentId']}<br>Severity: @{triggerBody()?['severity']}<br><br>Actions taken automatically:<br>✓ All sessions revoked<br>✓ Account disabled<br>✓ Added to HLX-Offboarding group<br>✓ Leaver workflow triggered<br><br>Time to containment: under 60 seconds.<br>Investigate the incident and confirm actions.</p>",
+                                            "Body": "<p class=\"editor-paragraph\">AUTOMATED SECURITY RESPONSE — PROJECT GATEKEEPER<br><br>Account contained: @{triggerBody()?['upn']}<br>Incident ID: @{triggerBody()?['incidentId']}<br>Severity: @{triggerBody()?['severity']}<br><br>Actions taken automatically:<br>✓ All sessions revoked<br>✓ Account disabled<br>✓ Added to HLX-Offboarding group<br>✓ Leaver workflow triggered<br><br>Automated containment actions completed.<br>Investigate the incident and confirm actions.</p>",
                                             "Importance": "Normal"
                                         },
                                         "path": "/v2/Mail"

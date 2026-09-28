@@ -251,7 +251,7 @@ All 14 rules deployed as Sentinel scheduled analytics and available in [`/kql-qu
 | Rule | Threat | Severity | Tactic | Technique |
 |---|---|---|---|---|
 | HLX-DETECT-001 | Break-Glass Account Access | **High** | Initial Access | T1078 |
-| HLX-DETECT-002 | Impossible Travel | **High** | Initial Access | T1078 |
+| HLX-DETECT-002 | Rapid Multi-Country Sign-ins | **High** | Initial Access | T1078 |
 | HLX-DETECT-003 | Password Spray | **High** | Credential Access | T1110.003 |
 | HLX-DETECT-004 | Role Assigned Outside PIM | **High** | Privilege Escalation | T1098.003 |
 | HLX-DETECT-005 | Pulse Legacy Account Activity | Medium | Initial Access | T1078.004 |

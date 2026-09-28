@@ -14,7 +14,7 @@ variable "subscription_id" {
 }
 
 variable "initial_password" {
-  description = "Helix@Gatekeeper2026!"
+  description = "Initial password for lab users"
   type        = string
   sensitive   = true
 }
